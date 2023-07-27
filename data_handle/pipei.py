@@ -42,8 +42,17 @@ def read_time(file_path):
     return read_base_time
 
 # 读取经纬度
-def read_loc():
-    pass
+def read_loc(file_path):
+    df = pd.read_csv(file_path)
+    if not df.empty:
+        if 'ERA5' or 'MERRA2' in file_path:
+            read_base_lat = df.iloc[:,3]
+            read_base_lon = df.iloc[:,4]
+        if 'MEIC' in file_path:
+            read_base_lon = df.iloc[:,2]
+            read_base_lat = df.iloc[:,3]
+    return read_base_lat,read_base_lon
+
 
 # 处理基表和merra2表
 def comper_b (path_a,path_b):
@@ -63,23 +72,36 @@ if __name__ == "__main__":
     for single_file_path in era5_path:
         # print(single_file_path) # D:/resource/chunmei/data/2020/era5\Read_ERA5_2020_01_month_CSJ_1.csv
         base_time_list = read_time(single_file_path)
-        for base_time in base_time_list:
+        base_lat_list, base_lon_list = read_loc(single_file_path)
+        for i in range(len(base_time_list)):
             # 获取到基表每一条时间
-            pass
+            base_time = base_time_list[i]
+            base_year = base_time[0:4]
+            base_month = base_time[5:7]
+            # 每一条经纬度
+            base_lat = base_lat_list[i]
+            base_lon = base_lon_list[i]
+            # print(base_time,base_year,base_month,base_lat,base_lon) 2020-01-01 00:00:00 2020 01 33.5 118.0
+
+            # 读取到 待匹配文件
             for meic_file_path in meic_path:
+                # print(meic_file_path) D:/resource/chunmei/data/2020/MEIC\merge_MEIC_LATLON.csv
                 # meic_year = read_time(meic_file_path) # 2016/01 <class 'pandas.core.series.Series'>
                 # meic_month = read_time(meic_file_path)[1] # 2016/01
+
+                # 时间数据
                 meic_time = read_time(meic_file_path)
-                base_year = base_time[0:4]
-                base_month = base_time[5:7]
-                for meic_time_row in meic_time:
+                # 经纬度数据
+                meic_lat_list,meic_lon_list = read_loc(meic_file_path)
+
+                for j in range(len(meic_time)):
                     # print(type(time_row)) <class 'pandas._libs.tslibs.timestamps.Timestamp'>
+                    meic_time_row = meic_time[j]
                     meic_time_row = meic_time_row.strftime("%Y/%m") # 转成str类型
                     meic_year = meic_time_row[0:4]
                     meic_month = meic_time_row[5:7]
+                    meic_lat = meic_lat_list[j]
+                    meic_lon = meic_lon_list[j]
+                    if base_year == meic_year and base_month == meic_month and base_lat-0.25<=meic_lat and base_lat+0.25>=meic_lat and base_lon-0.25<=meic_lon and base_lon+0.25>=meic_lon:
+                        pass
 
-                    if base_year == meic_year and base_month == meic_month:
-                        i = i+1
-                        print(i)
-            break
-        break
