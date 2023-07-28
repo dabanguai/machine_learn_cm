@@ -8,8 +8,6 @@ merra_dir_path = "D:/resource/chunmei/data/2020/merra2/"
 modis_dir_path = "D:/resource/chunmei/data/2020/modis/"
 meic_dir_path = "D:/resource/chunmei/data/2020/MEIC/"
 
-
-
 # 获取文件路径
 def find_files(dir):
     matching_files = []
